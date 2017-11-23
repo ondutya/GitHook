@@ -1,0 +1,6 @@
+#!/usr/bin/env python
+
+
+print("push failed")
+return 1
+

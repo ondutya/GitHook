@@ -1,0 +1,25 @@
+#!/usr/bin/env python
+
+#该钩子脚本由git merge命令调用，当在本地版本库完成git pull操作后触发执行。
+#该钩子脚本有一个参数，标识合并是否是一个压缩合并。
+#该钩子脚本不会影响git merge命令的结果。
+#如果合并因为冲突而失败，该脚本不会执行。
+
+# --- Command line
+import sys, os, re
+from subprocess import check_output
+
+#检测我们所在的分支
+branch = check_output(['git', 'symbolic-ref', '--short', 'HEAD']).strip()
+str_branch = str(branch, encoding='utf-8')
+#print("post-merge: On branch: '%s'" % branch)
+print(sys.argv)
+if str_branch != 'master':
+    print('not master')
+    #stash = check_output(['git', 'stash', 'save']).strip()
+    #str_stash = str(stash, encoding='utf-8')
+    #print(str_stash)
+    #check_output(['git', 'checkout', 'master'])
+    #print(check_output(['git', 'symbolic-ref', '--short', 'HEAD']).strip())
+else:
+    print('It is on master branch')
