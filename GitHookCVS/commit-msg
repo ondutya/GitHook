@@ -1,21 +1,37 @@
-#!/bin/sh
-#
-# An example hook script to check the commit log message.
-# Called by "git commit" with one argument, the name of the file
-# that has the commit message.  The hook should exit with non-zero
-# status after issuing an appropriate message if it wants to stop the
-# commit.  The hook is allowed to edit the commit message file.
-#
-# To enable this hook, rename this file to "commit-msg".
+#!/usr/bin/env python
 
-# Uncomment the below to add a Signed-off-by line to the message.
-# Doing this in a hook is a bad idea in general, but the prepare-commit-msg
-# hook is more suited to it.
-#
-# SOB=$(git var GIT_AUTHOR_IDENT | sed -n 's/^\(.*>\).*$/Signed-off-by: \1/p')
-# grep -qs "^$SOB" "$1" || echo "$SOB" >> "$1"
+import sys, os, re
+from subprocess import check_output
 
-# This example catches duplicate Signed-off-by lines.
+# 收集参数
+commit_msg_filepath = sys.argv[1]
 
-#echo "commit-msg: errors by Jiuzhen.An"
-exit 0
+cvs_update = 'cvs_update'
+cvs_update = 'cvs_commit'
+
+with open(commit_msg_filepath, 'r') as f:
+    content = f.read()
+
+if content.startswith(cvs_update):
+    switch_to_master = check_output(['git', 'checkout', 'master'])
+    get_branch_name = check_output(['git', 'symbolic-ref', '--short', 'HEAD']).strip()
+    if "master" == str(get_branch_name, encoding='utf-8'):
+        cvs_msg_update = check_output(['cvs', 'update']).strip()
+        str_cvs_msg_update = str(cvs_msg_update, encoding='utf-8')
+        print("msg: cvs update ↓↓↓")
+        print("str_cvs_msg_update")
+        sys.exit(1)
+    else:
+        print("msg: FAILD to Switched to branch !master!")
+        sys.exit(1)
+elif content.startswith(cvs_update):
+    pass
+else:
+    #cvs_msg_update = check_output(['cvs', 'update']).strip()
+    #str_cvs_msg_update = str(cvs_msg_update, encoding='utf-8')
+    #print("msg: cvs update over !!!")
+    #print(str_cvs_msg_update)
+    sys.exit(0)
+
+sys.exit(1)
+
